@@ -1,0 +1,5 @@
+account_id,company_name,contact_email,status,mrr
+CUST001,Acme Corporation,contact@acme.com,active,5000
+CUST002,TechStart Inc,info@techstart.io,active,3000
+CUST003,Global Solutions,sales@globalsolutions.net,inactive,0
+CUST006,Enterprise Co,admin@enterprise.co,active,10000

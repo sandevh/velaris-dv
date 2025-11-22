@@ -1,0 +1,40 @@
+{
+    "key_fields": {
+        "external": "customer_id",
+        "velaris": "account_id"
+    },
+    "mappings": [
+        {
+            "external": "customer_name",
+            "velaris": "company_name",
+            "rule": "equals",
+            "transform": [
+                "trim"
+            ]
+        },
+        {
+            "external": "email_address",
+            "velaris": "contact_email",
+            "rule": "case_insensitive_equals",
+            "transform": [
+                "trim",
+                "lower"
+            ]
+        },
+        {
+            "external": "subscription_status",
+            "velaris": "status",
+            "rule": "case_insensitive_equals",
+            "transform": [
+                "trim",
+                "lower"
+            ]
+        },
+        {
+            "external": "monthly_revenue",
+            "velaris": "mrr",
+            "rule": "equals",
+            "transform": []
+        }
+    ]
+}

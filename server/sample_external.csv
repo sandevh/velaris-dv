@@ -1,0 +1,6 @@
+customer_id,customer_name,email_address,subscription_status,monthly_revenue
+CUST001,Acme Corporation,contact@acme.com,ACTIVE,5000
+CUST002,TechStart Inc,info@techstart.io,active,2500
+CUST003,Global Solutions,sales@globalsolutions.net,INACTIVE,0
+CUST004,Innovation Labs,hello@innovationlabs.com,ACTIVE,7500
+CUST005,Digital Dynamics,support@digitaldynamics.com,TRIAL,1000
