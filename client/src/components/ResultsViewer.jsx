@@ -2,96 +2,110 @@ export default function ResultsViewer({ result, onReset }) {
     const total = result.matched.length + result.mismatched.length + result.missing_in_velaris.length + result.missing_in_external.length;
     const matchPercentage = total > 0 ? ((result.matched.length / total) * 100).toFixed(1) : 0;
 
+    // Safely render any value that might accidentally be an object/array
+    const renderValue = (val) => {
+        if (val === null || val === undefined || val === '') return '(empty)';
+        if (typeof val === 'object') {
+            try {
+                return JSON.stringify(val);
+            } catch (_) {
+                return '[object]';
+            }
+        }
+        return String(val);
+    };
+
     return (
-        <div className="mt-8 animate-slideIn">
-            <div className="bg-white p-6 rounded-xl shadow-2xl border-2 border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-bold text-3xl text-gray-800 flex items-center gap-3">
-                        <span className="text-4xl">📊</span>
-                        Comparison Results
-                    </h2>
+        <div className="card">
+            <div className="card-header">
+                <h3 className="card-title">Comparison Results</h3>
+                <button type="button" className="btn btn-danger" onClick={onReset}>Reset All</button>
+            </div>
+            <div className="stats-grid mb-lg">
+                <div className="stat-card" aria-label="Matched rows">
+                    <h4>Matched</h4>
+                    <div className="stat-value" style={{ color: 'var(--color-success)' }}>{result.matched.length}</div>
                 </div>
-
-                {/* Statistics Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border-2 border-green-200 shadow-md">
-                        <div className="text-3xl mb-1">✅</div>
-                        <div className="text-2xl font-bold text-green-700">{result.matched.length}</div>
-                        <div className="text-sm font-semibold text-green-600">Matched</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-red-50 to-rose-50 p-4 rounded-lg border-2 border-red-200 shadow-md">
-                        <div className="text-3xl mb-1">❌</div>
-                        <div className="text-2xl font-bold text-red-700">{result.mismatched.length}</div>
-                        <div className="text-sm font-semibold text-red-600">Mismatched</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-4 rounded-lg border-2 border-orange-200 shadow-md">
-                        <div className="text-3xl mb-1">📤</div>
-                        <div className="text-2xl font-bold text-orange-700">{result.missing_in_velaris.length}</div>
-                        <div className="text-sm font-semibold text-orange-600">Missing in Velaris</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg border-2 border-blue-200 shadow-md">
-                        <div className="text-3xl mb-1">📥</div>
-                        <div className="text-2xl font-bold text-blue-700">{result.missing_in_external.length}</div>
-                        <div className="text-sm font-semibold text-blue-600">Missing in External</div>
-                    </div>
+                <div className="stat-card" aria-label="Mismatched rows">
+                    <h4>Mismatched</h4>
+                    <div className="stat-value" style={{ color: 'var(--color-danger)' }}>{result.mismatched.length}</div>
                 </div>
-
-                {/* Match Percentage */}
-                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-lg border-2 border-indigo-200 mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-gray-700">Match Rate</span>
-                        <span className="font-bold text-2xl text-indigo-600">{matchPercentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                        <div
-                            className="bg-gradient-to-r from-indigo-500 to-purple-500 h-4 rounded-full transition-all duration-1000 ease-out"
-                            style={{ width: `${matchPercentage}%` }}
-                        ></div>
-                    </div>
+                <div className="stat-card" aria-label="Missing in Velaris">
+                    <h4>Missing in Velaris</h4>
+                    <div className="stat-value" style={{ color: 'var(--color-warning)' }}>{result.missing_in_velaris.length}</div>
                 </div>
-
-                {/* Mismatched Details */}
-                {result.mismatched.length > 0 && (
-                    <div className="mt-6">
-                        <h3 className="font-bold text-xl mb-4 text-gray-800 flex items-center gap-2">
-                            <span>🔍</span>
-                            Mismatch Details
-                        </h3>
-                        <div className="overflow-x-auto rounded-lg border-2 border-gray-200">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="bg-gradient-to-r from-gray-100 to-gray-50">
-                                        <th className="border-b-2 border-gray-300 p-3 text-left font-bold text-gray-700">ID</th>
-                                        <th className="border-b-2 border-gray-300 p-3 text-left font-bold text-gray-700">Differences</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {result.mismatched.map((m, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                                            <td className="border-b border-gray-200 p-3 font-semibold text-gray-700">{m.id}</td>
-                                            <td className="border-b border-gray-200 p-3">
-                                                {Object.entries(m.differences).map(([field, val]) => (
-                                                    <div key={field} className="mb-2 last:mb-0 p-2 bg-red-50 rounded border-l-4 border-red-400">
-                                                        <div className="font-bold text-gray-700 mb-1">{field}</div>
-                                                        <div className="text-xs">
-                                                            <span className="inline-block bg-orange-100 text-orange-800 px-2 py-1 rounded mr-2">
-                                                                External: <strong>{val.external || '(empty)'}</strong>
-                                                            </span>
-                                                            <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                                Velaris: <strong>{val.velaris || '(empty)'}</strong>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                <div className="stat-card" aria-label="Missing in External">
+                    <h4>Missing in External</h4>
+                    <div className="stat-value" style={{ color: 'var(--color-secondary)' }}>{result.missing_in_external.length}</div>
+                </div>
+                {result.filter_stats && (
+                    <div className="stat-card" aria-label="External rows kept">
+                        <h4>External Kept</h4>
+                        <div className="stat-value" style={{ color: 'var(--color-primary)' }}>
+                            {result.filter_stats.external.kept}/{result.filter_stats.external.original}
+                        </div>
+                    </div>
+                )}
+                {result.filter_stats && (
+                    <div className="stat-card" aria-label="Velaris rows kept">
+                        <h4>Velaris Kept</h4>
+                        <div className="stat-value" style={{ color: 'var(--color-secondary)' }}>
+                            {result.filter_stats.velaris.kept}/{result.filter_stats.velaris.original}
                         </div>
                     </div>
                 )}
             </div>
+            <div className="mb-lg" aria-label="Match rate">
+                <div className="flex justify-between items-center mb-sm">
+                    <strong>Match Rate</strong>
+                    <span style={{ fontSize: '1.15rem' }}>{matchPercentage}%</span>
+                </div>
+                <div className="progress" role="progressbar" aria-valuenow={matchPercentage} aria-valuemin={0} aria-valuemax={100}>
+                    <div className="progress-bar" style={{ width: `${matchPercentage}%` }} />
+                </div>
+            </div>
+            {result.filter_stats && (
+                <div className="mb-md" style={{ fontSize: '.7rem' }}>
+                    <strong>Filtering Summary:</strong> External dropped {result.filter_stats.external.dropped}; Velaris dropped {result.filter_stats.velaris.dropped}.
+                </div>
+            )}
+            {result.mismatched.length > 0 && (
+                <div className="mb-md">
+                    <h4 className="section-title" style={{ marginBottom: '8px' }}>Mismatch Details</h4>
+                    <div className="table-wrapper">
+                        <table className="table" aria-label="Mismatched field differences">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Differences</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {result.mismatched.map((m, idx) => (
+                                    <tr key={idx}>
+                                        <td>{m.id}</td>
+                                        <td>
+                                            {Object.entries(m.differences).map(([field, val]) => (
+                                                <div key={field} style={{ marginBottom: '6px', padding: '6px 8px', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '6px' }}>
+                                                    <strong style={{ display: 'block', fontSize: '.75rem', letterSpacing: '.05em' }}>{field}</strong>
+                                                    <div style={{ fontSize: '.7rem' }}>
+                                                        <span style={{ display: 'inline-block', marginRight: '8px' }}>
+                                                            External: <strong>{renderValue(val.external)}</strong>
+                                                        </span>
+                                                        <span style={{ display: 'inline-block' }}>
+                                                            Velaris: <strong>{renderValue(val.velaris)}</strong>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

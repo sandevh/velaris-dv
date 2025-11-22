@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import Papa from "papaparse";
 
 export default function CSVUploader({ label, setFile, setFields, fileName }) {
@@ -7,8 +6,6 @@ export default function CSVUploader({ label, setFile, setFields, fileName }) {
         if (!file) return;
 
         setFile(file);
-
-        // Extract headers
         Papa.parse(file, {
             preview: 1,
             header: true,
@@ -23,25 +20,22 @@ export default function CSVUploader({ label, setFile, setFields, fileName }) {
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-gray-200 hover:border-indigo-400 transition-all duration-200">
-            <label className="block mb-3 font-bold text-lg text-gray-800 flex items-center gap-2">
-                <span className="text-2xl">{label.includes("External") ? "📤" : "📥"}</span>
-                {label}
-            </label>
-            <div className="relative">
-                <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFile}
-                    className="block w-full text-sm text-gray-600 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-blue-600 file:to-indigo-600 file:text-white hover:file:from-blue-700 hover:file:to-indigo-700 file:cursor-pointer cursor-pointer file:transition-all file:duration-200"
-                />
-            </div>
+        <div className="card">
+            <label>{label}</label>
+            <input
+                key={fileName || 'empty'}
+                aria-label={`${label} file input`}
+                type="file"
+                accept=".csv"
+                onChange={handleFile}
+                className="input"
+            />
             {fileName && (
-                <div className="mt-3 p-3 bg-green-50 border-l-4 border-green-500 rounded-r animate-fadeIn">
-                    <p className="text-sm font-semibold text-green-800 flex items-center gap-2">
-                        <span>✓</span>
+                <div className="alert alert-success mt-md" role="status">
+                    <div>
+                        <strong style={{ display: 'block', marginBottom: 2 }}>File loaded</strong>
                         <span>{fileName}</span>
-                    </p>
+                    </div>
                 </div>
             )}
         </div>
