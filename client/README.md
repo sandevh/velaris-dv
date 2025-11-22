@@ -1,16 +1,54 @@
-# React + Vite
+# External → Velaris CSV Comparison Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This React + Vite client lets you upload two CSV files (an External source and a Velaris export), define a JSON-based mapping configuration, and submit both CSVs plus the config to the FastAPI server for record-level comparison.
 
-Currently, two official plugins are available:
+## Flow
+1. Upload External CSV.
+2. Upload Velaris CSV.
+3. Choose key fields (unique identifiers) for each file.
+4. Add mapping rows specifying:
+	 - `external_field`
+	 - `velaris_field`
+	 - `rule` (equals | case_insensitive_equals | contains)
+	 - Optional transforms for each side (`trim`, `lower`, `upper`).
+5. Preview the generated JSON config.
+6. Click Compare to send a multipart request containing both CSV files and the JSON mapping config to the server endpoint `POST /compare/external-velaris`.
+7. View counts of matched, mismatched, and missing records plus detailed field-level differences.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Mapping Config Schema
+```jsonc
+{
+	"key_fields": {
+		"external_field": "ExternalID",
+		"velaris_field": "VelarisID"
+	},
+	"mappings": [
+		{
+			"external_field": "ExternalName",
+			"velaris_field": "Name",
+			"rule": "case_insensitive_equals",
+			"external_transforms": ["trim", "lower"],
+			"velaris_transforms": ["trim", "lower"]
+		}
+	]
+}
+```
 
-## React Compiler
+## Development
+### Install
+```bash
+npm install
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Run Dev Server
+```bash
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Make sure the FastAPI server is running on `http://localhost:8000` with the compare route mounted at `/compare`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Environment Assumptions
+No environment variables are required; adjust the API base URL inside `App.jsx` if your backend differs.
+
+## License
+Internal / not for redistribution.
