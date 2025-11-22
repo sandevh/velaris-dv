@@ -39,18 +39,33 @@ Context:
 
 User Request: ${prompt}
 
-Generate a JavaScript function that transforms the 'value' variable.
+Generate the BODY of a JavaScript transformation function. The code will be placed inside this function:
+function transformValue(value) {
+  // YOUR CODE HERE
+}
+
 Rules:
+- Do NOT include the function declaration or wrapper
+- Write ONLY the code that goes inside the function body
+- Use 'value' as the input parameter
+- Use 'return' to output the result
 - Use simple JavaScript (no ES6+ features like arrow functions)
-- Access the input as 'value' variable
-- Return the transformed result
 - Keep it simple and efficient
 - Add comments to explain the logic
 
-Respond ONLY with the JavaScript code, no explanations before or after.
+Example - If asked "add ext prefix", respond with:
+// Add the 'ext' prefix to the original value
+return 'ext' + value;
+
+NOT:
+function transformValue(value) {
+  return 'ext' + value;
+}
+
+Respond ONLY with the function BODY code, no function wrapper, no explanations before or after.
 `;
 
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
