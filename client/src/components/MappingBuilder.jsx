@@ -287,6 +287,38 @@ export default function MappingBuilder({
                 </div>
             </div>
 
+            {/* Key Field Transformations */}
+            {(keyFields.external_field || keyFields.velaris_field) && (
+                <details style={{ marginBottom: '16px' }}>
+                    <summary style={{ cursor: 'pointer', fontSize: '.8rem', fontWeight: 600 }}>⚙️ Key Field Transformations (Optional)</summary>
+                    <div style={{ fontSize: '.7rem', color: 'var(--color-text-light)', marginTop: 8, marginBottom: 12 }}>
+                        Transform key field values before matching (e.g., remove prefixes, change format)
+                    </div>
+                    <div className="grid-2" style={{ gap: '16px', marginTop: '12px' }}>
+                        {keyFields.external_field && (
+                            <TransformationBuilder
+                                label={`${csvLabels.first} Key`}
+                                value={keyFields.external_custom || ""}
+                                onChange={(val) => setKeyFields({ ...keyFields, external_custom: val })}
+                                fieldName={keyFields.external_field}
+                                csvType={csvLabels.first}
+                                sampleValues={[]}
+                            />
+                        )}
+                        {keyFields.velaris_field && (
+                            <TransformationBuilder
+                                label={`${csvLabels.second} Key`}
+                                value={keyFields.velaris_custom || ""}
+                                onChange={(val) => setKeyFields({ ...keyFields, velaris_custom: val })}
+                                fieldName={keyFields.velaris_field}
+                                csvType={csvLabels.second}
+                                sampleValues={[]}
+                            />
+                        )}
+                    </div>
+                </details>
+            )}
+
             <div className="alert mb-lg" role="note">
                 <div><strong>Note:</strong> Key fields identify rows; do not remap them below.</div>
             </div>

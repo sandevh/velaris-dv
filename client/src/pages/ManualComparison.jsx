@@ -29,7 +29,13 @@ export default function ManualComparison() {
     const [mappings, setMappings] = useState([]);
     const [externalFilter, setExternalFilter] = useState({ logic: 'AND', conditions: [] });
     const [velarisFilter, setVelarisFilter] = useState({ logic: 'AND', conditions: [] });
-    const [keyFields, setKeyFields] = useState({ external_field: "", velaris_field: "" });
+    const [keyFields, setKeyFields] = useState({
+        external_field: "",
+        velaris_field: "",
+        external_custom: "",
+        velaris_custom: ""
+    });
+    const [compareOnlyMapped, setCompareOnlyMapped] = useState(true);
     const [result, setResult] = useState(null);
     const [showPreview, setShowPreview] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -95,6 +101,7 @@ export default function ManualComparison() {
         formData.append("mapping_config", JSON.stringify({
             key_fields: keyFields,
             mappings: validMappings,
+            compare_only_mapped: compareOnlyMapped,
             filters: {
                 external: sanitizedExternal,
                 velaris: sanitizedVelaris
@@ -123,7 +130,12 @@ export default function ManualComparison() {
         setMappings([]);
         setExternalFilter({ logic: 'AND', conditions: [] });
         setVelarisFilter({ logic: 'AND', conditions: [] });
-        setKeyFields({ external_field: "", velaris_field: "" });
+        setKeyFields({
+            external_field: "",
+            velaris_field: "",
+            external_custom: "",
+            velaris_custom: ""
+        });
         setResult(null);
         setShowPreview(false);
         setError(null);
@@ -215,6 +227,20 @@ export default function ManualComparison() {
 
             {safeExternalFields.length > 0 && safeVelarisFields.length > 0 && keyFields.external_field && keyFields.velaris_field && (
                 <section className="section fade-in">
+                    <div style={{ marginBottom: '16px' }}>
+                        <label className="checkbox-pill" style={{ display: 'inline-flex', alignItems: 'center', padding: '8px 16px', fontSize: '0.9rem', cursor: 'pointer' }}>
+                            <input
+                                type="checkbox"
+                                checked={compareOnlyMapped}
+                                onChange={(e) => setCompareOnlyMapped(e.target.checked)}
+                                style={{ marginRight: '8px' }}
+                            />
+                            <span>Compare only mapped fields (ignore unmapped columns)</span>
+                        </label>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light)', marginTop: '4px', marginLeft: '28px' }}>
+                            {compareOnlyMapped ? '✓ Will compare only the fields you added in mappings below' : '⚠ Will compare ALL columns in both CSVs (may show many differences)'}
+                        </div>
+                    </div>
                     <div className="flex flex-wrap gap-md items-center">
                         <button
                             className="btn btn-primary"
@@ -255,6 +281,7 @@ export default function ManualComparison() {
                             {JSON.stringify({
                                 key_fields: keyFields,
                                 mappings: getValidMappings(),
+                                compare_only_mapped: compareOnlyMapped,
                                 filters: {
                                     external: sanitizeFilter(externalFilter),
                                     velaris: sanitizeFilter(velarisFilter)

@@ -64,6 +64,11 @@ export default function ResultsViewer({ result, onReset }) {
                     <div className="progress-bar" style={{ width: `${matchPercentage}%` }} />
                 </div>
             </div>
+            {result.compare_mode && (
+                <div className="mb-md" style={{ fontSize: '.75rem', padding: '8px 12px', background: 'var(--color-bg-hover)', borderRadius: '6px' }}>
+                    <strong>Comparison Mode:</strong> {result.compare_mode === 'mapped_fields_only' ? '✓ Mapped fields only' : '⚠ All fields'}
+                </div>
+            )}
             {result.filter_stats && (
                 <div className="mb-md" style={{ fontSize: '.7rem' }}>
                     <strong>Filtering Summary:</strong> External dropped {result.filter_stats.external.dropped}; Velaris dropped {result.filter_stats.velaris.dropped}.
@@ -106,6 +111,113 @@ export default function ResultsViewer({ result, onReset }) {
                     </div>
                 </div>
             )}
+
+            {/* Detailed Records Section */}
+            <div className="mb-md">
+                <h4 className="section-title" style={{ marginBottom: '8px' }}>Detailed Record Breakdown</h4>
+
+                {/* Matched Records */}
+                {result.matched.length > 0 && (
+                    <details style={{ marginBottom: '16px' }}>
+                        <summary style={{ cursor: 'pointer', fontSize: '.9rem', fontWeight: 600, padding: '12px', background: 'var(--color-bg-hover)', borderRadius: '6px', color: 'var(--color-success)' }}>
+                            ✓ Matched Records ({result.matched.length})
+                        </summary>
+                        <div style={{ marginTop: '12px', padding: '12px', background: '#f0fdf4', borderRadius: '6px' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                {result.matched.map((id, idx) => (
+                                    <span key={idx} style={{
+                                        padding: '4px 12px',
+                                        background: '#dcfce7',
+                                        borderRadius: '4px',
+                                        fontSize: '.8rem',
+                                        border: '1px solid #86efac'
+                                    }}>
+                                        {id}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </details>
+                )}
+
+                {/* Mismatched Records */}
+                {result.mismatched.length > 0 && (
+                    <details style={{ marginBottom: '16px' }}>
+                        <summary style={{ cursor: 'pointer', fontSize: '.9rem', fontWeight: 600, padding: '12px', background: 'var(--color-bg-hover)', borderRadius: '6px', color: 'var(--color-danger)' }}>
+                            ⚠ Mismatched Records ({result.mismatched.length})
+                        </summary>
+                        <div style={{ marginTop: '12px', padding: '12px', background: '#fef2f2', borderRadius: '6px' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                {result.mismatched.map((m, idx) => (
+                                    <span key={idx} style={{
+                                        padding: '4px 12px',
+                                        background: '#fecaca',
+                                        borderRadius: '4px',
+                                        fontSize: '.8rem',
+                                        border: '1px solid #fca5a5'
+                                    }}>
+                                        {m.id}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </details>
+                )}
+
+                {/* Missing in Velaris */}
+                {result.missing_in_velaris.length > 0 && (
+                    <details style={{ marginBottom: '16px' }}>
+                        <summary style={{ cursor: 'pointer', fontSize: '.9rem', fontWeight: 600, padding: '12px', background: 'var(--color-bg-hover)', borderRadius: '6px', color: 'var(--color-warning)' }}>
+                            → Missing in Velaris ({result.missing_in_velaris.length})
+                        </summary>
+                        <div style={{ marginTop: '12px', padding: '12px', background: '#fffbeb', borderRadius: '6px' }}>
+                            <div style={{ fontSize: '.75rem', color: 'var(--color-text-light)', marginBottom: '8px' }}>
+                                Records present in External CSV but not found in Velaris CSV
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                {result.missing_in_velaris.map((id, idx) => (
+                                    <span key={idx} style={{
+                                        padding: '4px 12px',
+                                        background: '#fef3c7',
+                                        borderRadius: '4px',
+                                        fontSize: '.8rem',
+                                        border: '1px solid #fde68a'
+                                    }}>
+                                        {id}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </details>
+                )}
+
+                {/* Missing in External */}
+                {result.missing_in_external.length > 0 && (
+                    <details style={{ marginBottom: '16px' }}>
+                        <summary style={{ cursor: 'pointer', fontSize: '.9rem', fontWeight: 600, padding: '12px', background: 'var(--color-bg-hover)', borderRadius: '6px', color: 'var(--color-secondary)' }}>
+                            ← Missing in External ({result.missing_in_external.length})
+                        </summary>
+                        <div style={{ marginTop: '12px', padding: '12px', background: '#f5f5f5', borderRadius: '6px' }}>
+                            <div style={{ fontSize: '.75rem', color: 'var(--color-text-light)', marginBottom: '8px' }}>
+                                Records present in Velaris CSV but not found in External CSV
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                {result.missing_in_external.map((id, idx) => (
+                                    <span key={idx} style={{
+                                        padding: '4px 12px',
+                                        background: '#e5e5e5',
+                                        borderRadius: '4px',
+                                        fontSize: '.8rem',
+                                        border: '1px solid #d4d4d4'
+                                    }}>
+                                        {id}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </details>
+                )}
+            </div>
         </div>
     );
 }

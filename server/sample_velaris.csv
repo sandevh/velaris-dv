@@ -1,5 +1,7 @@
-account_id,company_name,contact_email,status,mrr
-CUST001,Acme Corporation,contact@acme.com,active,5000
-CUST002,TechStart Inc,info@techstart.io,active,3000
-CUST003,Global Solutions,sales@globalsolutions.net,inactive,0
-CUST006,Enterprise Co,admin@enterprise.co,active,10000
+account_id,company_name,contact_email,status,mrr,territory,onboarding_date,plan_type
+1,Acme Corporation,contact@acme.com,active,5000,US-EAST,1/15/2023,Premium
+2,TechStart Inc,info@techstart.io,active,3000,EU-WEST,3/20/2023,Standard
+3,Global Solutions,sales@globalsolutions.net,inactive,0,APAC,11/5/2022,Basic
+6,Enterprise Co,admin@enterprise.co,paused,10000,US-WEST,8/22/2022,Enterprise
+7,StartupHub,contact@startuphub.com,active,3500,EU-NORTH,9/14/2023,Standard
+9,DataCorp,sales@datacorp.com,active,8500,US-EAST,5/30/2023,Enterprise

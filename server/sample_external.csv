@@ -1,6 +1,9 @@
-customer_id,customer_name,email_address,subscription_status,monthly_revenue
-CUST001,Acme Corporation,contact@acme.com,ACTIVE,5000
-CUST002,TechStart Inc,info@techstart.io,active,2500
-CUST003,Global Solutions,sales@globalsolutions.net,INACTIVE,0
-CUST004,Innovation Labs,hello@innovationlabs.com,ACTIVE,7500
-CUST005,Digital Dynamics,support@digitaldynamics.com,TRIAL,1000
+customer_id,customer_name,email_address,subscription_status,monthly_revenue,region,signup_date,account_tier
+1,Acme Corporation,CONTACT@ACME.COM,ACTIVE,5000,North America,1/15/2023,premium
+2,TechStart Inc,info@techstart.io,active,2500,Europe,3/20/2023,standard
+3,Global Solutions,sales@globalsolutions.net,INACTIVE,0,Asia Pacific,11/5/2022,basic
+4,Innovation Labs,hello@innovationlabs.com,ACTIVE,7500,North America,6/10/2023,enterprise
+5,Digital Dynamics,support@digitaldynamics.com,TRIAL,1000,Europe,1/8/2024,trial
+6,Enterprise Co,admin@enterprise.co,PAUSED,10000,North America,8/22/2022,enterprise
+7,StartupHub,contact@startuphub.com,ACTIVE,3500,Europe,9/14/2023,standard
+8,CloudFirst Inc,info@cloudfirst.com,CANCELLED,0,Asia Pacific,2/28/2023,basic

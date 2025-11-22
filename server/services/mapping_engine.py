@@ -19,6 +19,9 @@ def execute_custom_function(value, js_code):
         code = re.sub(r'/\*.*?\*/', '', code, flags=re.DOTALL)
         
         # Translate common JS to Python
+        # Handle value.replace() - convert single quotes to double quotes for Python
+        code = re.sub(r"'", '"', code)
+        
         translations = [
             (r'value\.toString\(\)', 'str(value)'),
             (r'value\.trim\(\)', 'str(value).strip()'),
@@ -26,11 +29,9 @@ def execute_custom_function(value, js_code):
             (r'value\.toUpperCase\(\)', 'str(value).upper()'),
             (r'parseInt\(([^)]+)\)', r'int(\1)'),
             (r'parseFloat\(([^)]+)\)', r'float(\1)'),
-            (r'\.replace\(([^,]+),\s*([^)]+)\)', r'.replace(\1, \2)'),
             (r'\.split\(([^)]+)\)', r'.split(\1)'),
             (r'\.join\(([^)]+)\)', r'.join(\1)'),
             (r'\.substring\(([^)]+)\)', r'[\1]'),
-            (r'\.includes\(([^)]+)\)', r' in '),
         ]
         
         for pattern, replacement in translations:
@@ -61,13 +62,16 @@ def execute_custom_function(value, js_code):
         safe_locals = {'value': value}
         
         # Execute the code
-        exec(f"def transform_fn(value):\n    {code.replace(chr(10), chr(10) + '    ')}", safe_globals, safe_locals)
+        final_code = f"def transform_fn(value):\n    {code.replace(chr(10), chr(10) + '    ')}"
+        exec(final_code, safe_globals, safe_locals)
         result = safe_locals['transform_fn'](value)
         
         return result if result is not None else value
         
     except Exception as e:
-        print(f"Warning: Custom function execution failed: {e}")
+        print(f"Warning: Custom function execution failed for value '{value}': {e}")
+        print(f"  Original JS code: {js_code}")
+        print(f"  Translated Python code: {code}")
         return value
 
 # Dynamic transform registry - add new transforms here (simple, no-arg)
@@ -166,6 +170,7 @@ def apply_custom_pipeline(val, pipeline_str):
 def apply_mapping(external_df, velaris_df, config):
     """
     Apply transforms defined in mapping config to BOTH external and velaris CSVs.
+    Also applies transformations to key fields.
     Mapping entries now use keys:
       external_field, velaris_field, external_transforms, velaris_transforms,
       external_custom (pipeline or JS function), velaris_custom
@@ -173,6 +178,32 @@ def apply_mapping(external_df, velaris_df, config):
     external = external_df.copy()
     velaris = velaris_df.copy()
 
+    # Apply key field transformations first
+    key_fields = config.get("key_fields", {})
+    ext_key_field = key_fields.get("external_field")
+    vel_key_field = key_fields.get("velaris_field")
+    ext_key_custom = key_fields.get("external_custom", "")
+    vel_key_custom = key_fields.get("velaris_custom", "")
+
+    if ext_key_field and ext_key_field in external.columns and ext_key_custom:
+        print(f"[DEBUG] Applying external key transformation on '{ext_key_field}': {ext_key_custom}")
+        original_sample = external[ext_key_field].iloc[0] if len(external) > 0 else None
+        # Check if it's a pipeline or custom JS function
+        if '|' in ext_key_custom or any(op in ext_key_custom for op in ['trim', 'lower', 'upper', 'replace(', 'map(']):
+            external[ext_key_field] = external[ext_key_field].apply(lambda x: apply_custom_pipeline(x, ext_key_custom))
+        else:
+            external[ext_key_field] = external[ext_key_field].apply(lambda x: execute_custom_function(x, ext_key_custom))
+        transformed_sample = external[ext_key_field].iloc[0] if len(external) > 0 else None
+        print(f"[DEBUG] External key transformation result: {original_sample} -> {transformed_sample}")
+
+    if vel_key_field and vel_key_field in velaris.columns and vel_key_custom:
+        # Check if it's a pipeline or custom JS function
+        if '|' in vel_key_custom or any(op in vel_key_custom for op in ['trim', 'lower', 'upper', 'replace(', 'map(']):
+            velaris[vel_key_field] = velaris[vel_key_field].apply(lambda x: apply_custom_pipeline(x, vel_key_custom))
+        else:
+            velaris[vel_key_field] = velaris[vel_key_field].apply(lambda x: execute_custom_function(x, vel_key_custom))
+
+    # Apply field mapping transformations
     for m in config["mappings"]:
         e = m.get("external_field")
         v = m.get("velaris_field")

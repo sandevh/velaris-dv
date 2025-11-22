@@ -28,6 +28,7 @@ def compare_values(a, b, rule):
 def compare_records(external, velaris, config):
     key_e = config["key_fields"]["external_field"]
     key_v = config["key_fields"]["velaris_field"]
+    compare_only_mapped = config.get("compare_only_mapped", True)
 
     # Validate key fields exist
     if key_e not in external.columns:
@@ -42,7 +43,8 @@ def compare_records(external, velaris, config):
         "matched": [],
         "mismatched": [],
         "missing_in_velaris": [],
-        "missing_in_external": []
+        "missing_in_external": [],
+        "compare_mode": "mapped_fields_only" if compare_only_mapped else "all_fields"
     }
 
     for key in external.index:
@@ -51,28 +53,47 @@ def compare_records(external, velaris, config):
             continue
 
         diff = {}
-        for m in config["mappings"]:
-            e = m["external_field"]
-            v = m["velaris_field"]
-            rule = m["rule"]
+        has_field_mappings = False
+        
+        if compare_only_mapped:
+            # Compare only the mapped fields
+            for m in config["mappings"]:
+                e = m["external_field"]
+                v = m["velaris_field"]
+                rule = m["rule"]
 
-            # Skip if the field is the key field (it's now the index, not a column)
-            if e == key_e or v == key_v:
-                continue
+                # Skip if the field is the key field (it's now the index, not a column)
+                if e == key_e or v == key_v:
+                    continue
 
-            # Check if fields exist in the dataframe
-            if e not in external.columns:
-                raise ValueError(f"Field '{e}' not found in external CSV")
-            if v not in velaris.columns:
-                raise ValueError(f"Field '{v}' not found in velaris CSV")
+                # Check if fields exist in the dataframe
+                if e not in external.columns:
+                    raise ValueError(f"Field '{e}' not found in external CSV")
+                if v not in velaris.columns:
+                    raise ValueError(f"Field '{v}' not found in velaris CSV")
 
-            a = external.loc[key][e]
-            b = velaris.loc[key][v]
+                has_field_mappings = True
+                a = external.loc[key][e]
+                b = velaris.loc[key][v]
 
-            if not compare_values(a, b, rule):
-                diff[e] = {"external": str(a), "velaris": str(b)}
+                if not compare_values(a, b, rule):
+                    diff[e] = {"external": str(a), "velaris": str(b)}
+        else:
+            # Compare ALL fields (original behavior - match columns by name)
+            common_columns = set(external.columns) & set(velaris.columns)
+            for col in common_columns:
+                has_field_mappings = True
+                a = external.loc[key][col]
+                b = velaris.loc[key][col]
+                
+                # Use equals by default for all-field comparison
+                if not compare_values(a, b, "equals"):
+                    diff[col] = {"external": str(a), "velaris": str(b)}
 
-        if diff:
+        # If no field mappings were checked, consider it a match (key-only matching)
+        if not has_field_mappings:
+            results["matched"].append(str(key))
+        elif diff:
             results["mismatched"].append({"id": str(key), "differences": diff})
         else:
             results["matched"].append(str(key))

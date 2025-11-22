@@ -31,10 +31,8 @@ export default function ScheduledComparisons() {
                             lineHeight: '2'
                         }}>
                             <li>📅 Schedule comparisons (daily, weekly, monthly)</li>
-                            <li>🔔 Email notifications for comparison results</li>
+                            <li>🔔 Slack notifications for comparison results</li>
                             <li>📊 Historical comparison tracking</li>
-                            <li>⚙️ Reusable comparison configurations</li>
-                            <li>📈 Trend analysis and reporting</li>
                             <li>🔗 API integration for automated workflows</li>
                         </ul>
                     </div>
