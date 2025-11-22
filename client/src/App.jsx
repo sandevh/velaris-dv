@@ -12,7 +12,7 @@ const APP_CONFIG = {
     first: import.meta.env.VITE_CSV1_LABEL || "External CSV",
     second: import.meta.env.VITE_CSV2_LABEL || "Velaris CSV"
   },
-  appTitle: import.meta.env.VITE_APP_TITLE || "CSV Comparison Tool",
+  appTitle: import.meta.env.VITE_APP_TITLE || "VELARIS DV TOOL",
   appSubtitle: import.meta.env.VITE_APP_SUBTITLE || "Compare CSV files with custom field mappings",
   transformOptions: (import.meta.env.VITE_TRANSFORM_OPTIONS || "trim,lower,upper").split(","),
   comparisonRules: JSON.parse(import.meta.env.VITE_COMPARISON_RULES || JSON.stringify([
